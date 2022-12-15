@@ -65,7 +65,7 @@ bool ZMQConsumer::CreateSocket() {
   DCHECK(rc == 0);
   if (!identity_.empty()) {
     rc = HANDLE_EINTR(zmq_setsockopt(zmq_socket_->handle(), ZMQ_ROUTING_ID, identity_.data(), identity_.size()));
-    DCHECK(rc);
+    DCHECK(rc == 0);
   }
   if (zmq_socket_->bind(url_)) {
     LOG(ERROR) << "consumer bind: " << url_ << " failed: " << zmq_strerror(zmq_errno());
