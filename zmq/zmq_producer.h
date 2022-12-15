@@ -14,7 +14,8 @@ namespace zmq {
 class ZMQProducer {
 public:
  explicit ZMQProducer(const scoped_refptr<ref_context_t> &context,
-                      const std::string &url);
+                      const std::string &url,
+                      const std::string &identity = {});
 
  virtual ~ZMQProducer();
 
@@ -35,9 +36,11 @@ private:
 
  bool Send(protocol::MQMessage *message);
 
+ scoped_refptr<ref_context_t> context_;
+
  std::string url_;
 
- scoped_refptr<ref_context_t> context_;
+ std::string identity_;
 
  std::unique_ptr<zmq::socket_t> zmq_socket_;
 

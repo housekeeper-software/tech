@@ -26,7 +26,8 @@ public:
  };
  explicit ZMQConsumer(Delegate *delegate,
                       const scoped_refptr<ref_context_t> &context,
-                      const std::string &url);
+                      const std::string &url,
+                      const std::string &identity={});
 
  virtual ~ZMQConsumer();
 
@@ -47,6 +48,8 @@ private:
  scoped_refptr<ref_context_t> context_;
 
  std::string url_;
+
+ std::string identity_;
 
  std::unique_ptr<zmq::socket_t> zmq_socket_;
 

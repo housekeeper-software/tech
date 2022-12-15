@@ -4,10 +4,12 @@
 namespace zmq {
 ZMQConsumer::ZMQConsumer(Delegate *delegate,
                          const scoped_refptr<ref_context_t> &context,
-                         const std::string &url)
+                         const std::string &url,
+                         const std::string &identity)
     : delegate_(delegate),
       context_(context),
       url_(url),
+      identity_(identity),
       keep_running_(true),
       thread_(new base::DelegateSimpleThread(this, "ZMQConsumer")) {
   thread_->Start();
@@ -61,6 +63,10 @@ bool ZMQConsumer::CreateSocket() {
   int opt = 0;
   int rc = zmq_setsockopt(zmq_socket_->handle(), ZMQ_LINGER, &opt, sizeof(opt));
   DCHECK(rc == 0);
+  if (!identity_.empty()) {
+    rc = HANDLE_EINTR(zmq_setsockopt(zmq_socket_->handle(), ZMQ_ROUTING_ID, identity_.data(), identity_.size()));
+    DCHECK(rc);
+  }
   if (zmq_socket_->bind(url_)) {
     LOG(ERROR) << "consumer bind: " << url_ << " failed: " << zmq_strerror(zmq_errno());
     return false;

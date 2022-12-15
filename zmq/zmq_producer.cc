@@ -5,9 +5,11 @@
 namespace zmq {
 
 ZMQProducer::ZMQProducer(const scoped_refptr<ref_context_t> &context,
-                         const std::string &url)
+                         const std::string &url,
+                         const std::string &identity)
     : context_(context),
       url_(url),
+      identity_(identity),
       thread_(new base::Thread("ZMQProducer")),
       weak_factory_(this) {
   weak_ptr_ = weak_factory_.GetWeakPtr();
@@ -76,6 +78,10 @@ bool ZMQProducer::CreateSocket() {
   int opt = 0;
   int rc = zmq_setsockopt(zmq_socket_->handle(), ZMQ_LINGER, &opt, sizeof(opt));
   DCHECK(rc == 0);
+  if (!identity_.empty()) {
+    rc = HANDLE_EINTR(zmq_setsockopt(zmq_socket_->handle(), ZMQ_ROUTING_ID, identity_.data(), identity_.size()));
+    DCHECK(rc);
+  }
   if (zmq_socket_->connect(url_)) {
     LOG(ERROR) << "producer connect: " << url_ << " failed: " << zmq_strerror(zmq_errno());
     return false;
