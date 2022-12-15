@@ -1,0 +1,14 @@
+
+syntax = "proto3";
+
+package protocol;
+
+option optimize_for = LITE_RUNTIME;
+
+message MQMessage{
+	string id = 1;
+	uint32 type = 2;
+    bool ack = 3;
+	string extension = 4;
+	bytes payload = 5;
+}
